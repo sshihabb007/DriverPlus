@@ -160,9 +160,30 @@ namespace DriverPlus.Services
                                 WriteResponse(ns, 200, "OK", "text/html; charset=utf-8", BuildDashboardHtml(scriptNonce), scriptNonce);
                                 return;
                             }
+                            if (path == "/logo.png")
+                            {
+                                byte[] logoBytes = ReadEmbeddedResourceBytes("DriverPlus.logo.png");
+                                if (logoBytes != null && logoBytes.Length > 0)
+                                {
+                                    WriteResponseBytes(ns, 200, "OK", "image/png", logoBytes, null);
+                                }
+                                else
+                                {
+                                    WriteResponseBytes(ns, 204, "No Content", "image/png", new byte[0], null);
+                                }
+                                return;
+                            }
                             if (path == "/favicon.ico")
                             {
-                                WriteResponseBytes(ns, 204, "No Content", "image/x-icon", new byte[0], null);
+                                byte[] icoBytes = ReadEmbeddedResourceBytes("DriverPlus.app.ico");
+                                if (icoBytes != null && icoBytes.Length > 0)
+                                {
+                                    WriteResponseBytes(ns, 200, "OK", "image/x-icon", icoBytes, null);
+                                }
+                                else
+                                {
+                                    WriteResponseBytes(ns, 204, "No Content", "image/x-icon", new byte[0], null);
+                                }
                                 return;
                             }
                             if (path == "/api/bootstrap")
@@ -524,7 +545,7 @@ namespace DriverPlus.Services
             sb.Append("Cache-Control: no-store\r\n");
             sb.Append("X-Content-Type-Options: nosniff\r\n");
             sb.Append("X-Frame-Options: DENY\r\n");
-            sb.Append("Content-Security-Policy: default-src 'self'; style-src 'unsafe-inline'; script-src " + scriptPolicy + "; connect-src 'self'\r\n");
+            sb.Append("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'unsafe-inline'; script-src " + scriptPolicy + "; connect-src 'self'\r\n");
             sb.Append("Connection: close\r\n\r\n");
 
             byte[] head = Encoding.ASCII.GetBytes(sb.ToString());
@@ -534,6 +555,26 @@ namespace DriverPlus.Services
                 ns.Write(payload, 0, payload.Length);
             }
             ns.Flush();
+        }
+
+        private static byte[] ReadEmbeddedResourceBytes(string resourceName)
+        {
+            try
+            {
+                using (Stream s = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+                {
+                    if (s == null) return null;
+                    using (var ms = new MemoryStream())
+                    {
+                        s.CopyTo(ms);
+                        return ms.ToArray();
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         private static string GenerateSecureHexToken(int numBytes)
@@ -559,6 +600,7 @@ namespace DriverPlus.Services
 <meta charset=""utf-8"">
 <meta name=""viewport"" content=""width=device-width, initial-scale=1"">
 <meta name=""driverplus-csrf"" content=""" + _csrfToken + @""">
+<link rel=""icon"" href=""/favicon.ico"">
 <title>Driver+ Telemetry &amp; Hardware Audit Console</title>
 <style>
 :root {
@@ -593,12 +635,9 @@ header.topbar {
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
 }
-.brand { display: flex; align-items: center; gap: 12px; }
-.brand-badge {
-  width: 36px; height: 36px; border-radius: 9px;
-  background: linear-gradient(135deg, #059669, #10B981);
-  display: inline-flex; align-items: center; justify-content: center;
-  font-weight: 800; color: #051B14; font-size: 16px;
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-logo {
+  height: 44px; width: auto; display: block; object-fit: contain;
 }
 .brand h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
 .brand small { display: block; color: var(--text-muted); font-size: 12px; }
@@ -729,7 +768,7 @@ tr:hover td { background: rgba(30, 41, 59, 0.45); }
 <body>
 <header class=""topbar"">
   <div class=""brand"">
-    <span class=""brand-badge"" aria-hidden=""true"">D+</span>
+    <img src=""/logo.png"" alt=""Driver+"" class=""brand-logo"">
     <div>
       <h1>Driver+ Telemetry Console</h1>
       <small id=""subtitle"">100% Official Microsoft Update Catalog &amp; SetupAPI Hardware Inspector</small>

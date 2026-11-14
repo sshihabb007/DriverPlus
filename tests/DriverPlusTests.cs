@@ -490,6 +490,12 @@ Signer Name:        Microsoft Windows Hardware Compatibility Publisher
                     AssertEx.Equal(HttpStatusCode.OK, htmlResp.StatusCode, "GET / returns 200 OK");
                     string html = htmlResp.Content.ReadAsStringAsync().Result;
                     AssertEx.True(html.IndexOf("Driver+ Telemetry", StringComparison.Ordinal) >= 0, "Dashboard HTML served");
+                    AssertEx.True(html.IndexOf("src=\"/logo.png\"", StringComparison.Ordinal) >= 0, "Dashboard HTML embeds brand logo");
+
+                    HttpResponseMessage logoResp = http.GetAsync(baseUrl + "/logo.png").Result;
+                    AssertEx.Equal(HttpStatusCode.OK, logoResp.StatusCode, "GET /logo.png returns 200 OK");
+                    byte[] logoBytes = logoResp.Content.ReadAsByteArrayAsync().Result;
+                    AssertEx.True(logoBytes.Length > 1024 && logoBytes[0] == 0x89 && logoBytes[1] == 0x50, "Embedded PNG logo served with valid PNG signature");
 
                     HttpResponseMessage bootResp = http.GetAsync(baseUrl + "/api/bootstrap").Result;
                     AssertEx.Equal(HttpStatusCode.OK, bootResp.StatusCode, "GET /api/bootstrap returns 200 OK");

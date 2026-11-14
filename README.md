@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="assets/driverplus.png" alt="Driver+ Logo" width="128" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/driverplus.png" />
+    <source media="(prefers-color-scheme: light)" srcset="assets/driverplus-light.png" />
+    <img src="assets/driverplus.png" alt="Driver+ — Be Updated To Be Better" width="380" />
+  </picture>
 </p>
 
 <h1 align="center">Driver+</h1>
@@ -10,17 +14,17 @@
 
 <p align="center">
   <a href="https://github.com/sshihabb007/DriverPlus/releases/latest">
-    <img src="https://img.shields.io/github/v/release/sshihabb007/DriverPlus?style=flat-square&color=10b981&label=Release" alt="Latest Release" />
+    <img src="https://img.shields.io/github/v/release/sshihabb007/DriverPlus?style=flat-square&color=0ea5e9&label=Release" alt="Latest Release" />
   </a>
   <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(x64)-2563eb?style=flat-square" alt="Windows 10 | 11 x64" />
-  <img src="https://img.shields.io/badge/Binary-266%20KB%20Native%20PE32%2B-0ea5e9?style=flat-square" alt="266 KB Native PE32+" />
+  <img src="https://img.shields.io/badge/Architecture-Native%20PE32%2B%20x86__64-0284c7?style=flat-square" alt="Native PE32+ x86_64" />
   <img src="https://img.shields.io/badge/Supply%20Chain-Microsoft%20WHQL%20%2B%20WinVerifyTrust-f59e0b?style=flat-square" alt="Microsoft WHQL + WinVerifyTrust" />
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-a855f7?style=flat-square" alt="MIT License" />
   </a>
 </p>
 
-**Driver+** is a fast, lightweight (`~266 KB` portable executable, zero third-party NuGet dependencies, zero background resident bloatware, zero telemetry) open-source Windows hardware &amp; driver management suite. Every update candidate is resolved exclusively from **local Windows Update Agent (`Microsoft.Update.Session`)** and the **live Microsoft Update Catalog (`catalog.update.microsoft.com`)**, verified against embedded **40-hex SHA-1 CAB digests** and **`WinVerifyTrust` Authenticode signatures** before touching `newdev.dll!DiInstallDriverW`.
+**Driver+** is a fast, lightweight (`432 KB` self-contained portable executable, zero third-party NuGet dependencies, zero background resident bloatware, zero telemetry) open-source Windows hardware &amp; driver management suite. Every update candidate is resolved exclusively from **local Windows Update Agent (`Microsoft.Update.Session`)** and the **live Microsoft Update Catalog (`catalog.update.microsoft.com`)**, verified against embedded **40-hex SHA-1 CAB digests** and **`WinVerifyTrust` Authenticode signatures** before touching `newdev.dll!DiInstallDriverW`.
 
 ---
 
@@ -115,10 +119,10 @@ flowchart LR
 
 Measured on a live Windows 11 x64 laptop (`12th Gen Intel Core i5-12450HX`, `293` total PnP devnodes — `214` present / `79` unplugged ghosts, `195` OEM DriverStore INF packages, `14` runtimes):
 
-| Metric | Legacy Commercial Updaters (Typical) | **Driver+ `v1.0.0` (x64)** |
+| Metric | Legacy Commercial Updaters (Typical) | **Driver+ `v1.0.1` (x64)** |
 | :--- | :--- | :--- |
 | **Process Architecture** | 32-bit `PE32` (`WOW64`) + multiple background services | **Native 64-bit `PE32+` (`x86_64`)**, `0` background daemons |
-| **Disk Footprint** | `200 MB – 300 MB+` (`600+` files) | **`266.0 KB`** Portable EXE / **`162.5 KB`** Setup Wizard |
+| **Disk Footprint** | `200 MB – 300 MB+` (`600+` files) | **`432.0 KB`** Portable EXE / **`530.5 KB`** Setup Wizard |
 | **Memory Usage (Full Scan)** | `~195 MB+` idle across resident tray/service helpers | **`42.3 MB`** warm / **`48.2 MB`** cold private memory |
 | **Full Live WHQL Scan Latency** | Proprietary cloud scan | **`2.75 s`** warm / **`13.0 s`** cold (WUA + live MS Update Catalog) |
 | **Third-Party Dependencies** | Bundled Chromium/CEF, proprietary DLLs, ad SDKs | **`0` NuGet packages** (100% inbox Windows `.NET 4.x` + Win32 P/Invoke) |
@@ -129,13 +133,13 @@ Measured on a live Windows 11 x64 laptop (`12th Gen Intel Core i5-12450HX`, `293
 
 ### Option 1: Native x64 Setup Wizard *(Recommended)*
 
-1. Download **`DriverPlus-Setup-1.0.0-x64.exe`** from the [**Latest GitHub Release**](https://github.com/sshihabb007/DriverPlus/releases/latest).
+1. Download **`DriverPlus-Setup-1.0.1-x64.exe`** from the [**Latest GitHub Release**](https://github.com/sshihabb007/DriverPlus/releases/latest).
 2. Run the installer, choose your install folder (defaults to `%LOCALAPPDATA%\Programs\DriverPlus` — no Administrator rights required to install), and optionally enable Desktop / Start Menu shortcuts.
 3. Uninstall cleanly anytime from **Windows Settings &gt; Installed Apps** or via `Uninstall.exe` inside the install folder.
 
 ### Option 2: Zero-Install Portable Executable
 
-1. Download **`DriverPlus-Portable-1.0.0-x64.exe`** from the [**Latest GitHub Release**](https://github.com/sshihabb007/DriverPlus/releases/latest).
+1. Download **`DriverPlus-Portable-1.0.1-x64.exe`** from the [**Latest GitHub Release**](https://github.com/sshihabb007/DriverPlus/releases/latest).
 2. Run it directly from any folder or USB rescue drive — zero installation required.
 
 ### Option 3: Build &amp; Verify from Source *(Zero External Dependencies)*
@@ -153,7 +157,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\test.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -SkipDesktopCopy
 ```
 
-Build outputs are emitted to `dist\DriverPlus-Portable-1.0.0-x64.exe` and `dist\DriverPlus-Setup-1.0.0-x64.exe`.
+Build outputs are emitted to `dist\DriverPlus-Portable-1.0.1-x64.exe` and `dist\DriverPlus-Setup-1.0.1-x64.exe`.
 
 ---
 
@@ -171,13 +175,13 @@ Build outputs are emitted to `dist\DriverPlus-Portable-1.0.0-x64.exe` and `dist\
 | `DriverPlus.exe --scan-json scan.json --offline` | Export local hardware + WUA + DriverStore JSON report without network queries |
 | `DriverPlus.exe --serve-ui --port 17890` | Start the hardened `127.0.0.1` loopback web telemetry console |
 
-### Setup Wizard &amp; Uninstaller (`DriverPlus-Setup-1.0.0-x64.exe` / `Uninstall.exe`)
+### Setup Wizard &amp; Uninstaller (`DriverPlus-Setup-1.0.1-x64.exe` / `Uninstall.exe`)
 
 | Command | Description |
 | :--- | :--- |
-| `DriverPlus-Setup-1.0.0-x64.exe` | Launch interactive dark-themed x64 Setup Wizard |
-| `DriverPlus-Setup-1.0.0-x64.exe --silent` | Silent per-user install to `%LOCALAPPDATA%\Programs\DriverPlus` (alias: `/S`) |
-| `DriverPlus-Setup-1.0.0-x64.exe --silent --install-dir "C:\Tools\DriverPlus"` | Silent install to a custom target folder |
+| `DriverPlus-Setup-1.0.1-x64.exe` | Launch interactive dark-themed x64 Setup Wizard |
+| `DriverPlus-Setup-1.0.1-x64.exe --silent` | Silent per-user install to `%LOCALAPPDATA%\Programs\DriverPlus` (alias: `/S`) |
+| `DriverPlus-Setup-1.0.1-x64.exe --silent --install-dir "C:\Tools\DriverPlus"` | Silent install to a custom target folder |
 | `Uninstall.exe --uninstall --silent` | Silent clean removal of owned Driver+ files, shortcuts &amp; registry entry |
 
 ---
@@ -188,8 +192,10 @@ Build outputs are emitted to `dist\DriverPlus-Portable-1.0.0-x64.exe` and `dist\
 DriverPlus/
 ├── .github/workflows/            # Windows x64 CI test gate & tagged Release automation
 ├── assets/
-│   ├── driverplus.ico            # Multi-resolution Windows icon (16px..256px)
-│   └── driverplus.png            # High-DPI application badge
+│   ├── driverplus.png            # Official high-resolution Driver+ wordmark (dark mode)
+│   ├── driverplus-light.png      # Theme-adaptive wordmark for light-mode documentation
+│   ├── logo-ui.png               # Retina UI brand banner embedded in Portable & Setup EXEs
+│   └── driverplus.ico            # Multi-resolution Windows application icon (16px..256px)
 ├── docs/
 │   ├── architecture.html         # Interactive single-file HTML architecture walkthrough
 │   ├── spec.md                   # Clean-room functional & security specification
@@ -197,7 +203,7 @@ DriverPlus/
 ├── installer/
 │   └── DriverPlusSetupWizard.cs  # Native x64 Setup Wizard & owned-file Uninstaller
 ├── scripts/
-│   └── generate_icon.py          # Deterministic multi-size ICO/PNG asset generator
+│   └── generate_icons.ps1        # Zero-dependency .NET System.Drawing ICO & UI asset pipeline
 ├── src/
 │   ├── app.manifest              # amd64 + PerMonitorV2 DPI + least-privilege asInvoker
 │   ├── Program.cs                # Entry point, single-instance mutex & CLI modes

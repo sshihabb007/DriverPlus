@@ -2,6 +2,14 @@
 
 All notable changes to **Driver+** are documented in this file.
 
+## [1.0.1] - 2026-11-14
+
+### Changed
+- **Official `Driver+` Brand Logo & Multi-Resolution Icon Suite**:
+  - Updated the master brand artwork (`assets/driverplus.png`), added a theme-adaptive GitHub Light-Mode counterpart (`assets/driverplus-light.png`) via `<picture>`, and generated a crisp 7-layer Windows icon (`assets/driverplus.ico`, `16px`–`256px`) with compact `D+` taskbar/tray frames (`16–32px`) and full wordmark frames (`48–256px`).
+  - Embedded `DriverPlus.logo.png` and `DriverPlus.app.ico` directly into the Portable executable, Setup Wizard header (`DriverPlusSetupWizard.cs`), WPF Desktop Navigation Rail (`MainWindow.cs`), and Loopback Web Telemetry Console (`GET /logo.png` & `GET /favicon.ico`).
+  - Replaced the Python asset script with a zero-dependency PowerShell + `.NET System.Drawing` asset pipeline (`scripts/generate_icons.ps1`).
+
 ## [1.0.0] - 2026-11-14
 
 ### Added

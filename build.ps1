@@ -1,6 +1,6 @@
 param(
     [switch]$SkipDesktopCopy,
-    [string]$Version = "1.0.0"
+    [string]$Version = "1.0.1"
 )
 
 $ErrorActionPreference = "Stop"
@@ -10,6 +10,7 @@ $DistDir = Join-Path $ProjectRoot "dist"
 $ObjDir = Join-Path $ProjectRoot "obj"
 $AssetsDir = Join-Path $ProjectRoot "assets"
 $IconPath = Join-Path $AssetsDir "driverplus.ico"
+$LogoUiPath = Join-Path $AssetsDir "logo-ui.png"
 $ManifestPath = Join-Path $ProjectRoot "src\app.manifest"
 $OutExe = Join-Path $DistDir "DriverPlus.exe"
 $PortableReleaseExe = Join-Path $DistDir "DriverPlus-Portable-$Version-x64.exe"
@@ -25,9 +26,9 @@ if ($RunningProcs) {
     Start-Sleep -Milliseconds 350
 }
 
-if (-not (Test-Path $IconPath)) {
-    Write-Host "[1/6] Generating multi-resolution icon..."
-    python (Join-Path $ProjectRoot "scripts\generate_icon.py")
+if ((-not (Test-Path $IconPath)) -or (-not (Test-Path $LogoUiPath))) {
+    Write-Host "[1/6] Generating multi-resolution icons & UI brand assets..."
+    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $ProjectRoot "scripts\generate_icons.ps1")
 }
 
 $FwDir = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319"
@@ -60,6 +61,8 @@ Write-Host "[2/6] Compiling native 64-bit Hardened Portable DriverPlus.exe (/pla
     "/out:$OutExe" `
     "/win32icon:$IconPath" `
     "/win32manifest:$ManifestPath" `
+    "/resource:$IconPath,DriverPlus.app.ico" `
+    "/resource:$LogoUiPath,DriverPlus.logo.png" `
     /r:"$FwDir\System.dll" `
     /r:"$FwDir\System.Core.dll" `
     /r:"$FwDir\Microsoft.CSharp.dll" `
@@ -143,6 +146,7 @@ $InstallerSrc = Join-Path $ProjectRoot "installer\DriverPlusSetupWizard.cs"
     /r:"$FwDir\System.IO.Compression.dll" `
     /r:"$FwDir\System.IO.Compression.FileSystem.dll" `
     "/resource:$IconPath,DriverPlusInstaller.app.ico" `
+    "/resource:$LogoUiPath,DriverPlusInstaller.logo.png" `
     "/resource:$PayloadZip,DriverPlusInstaller.payload.zip" `
     $InstallerSrc
 

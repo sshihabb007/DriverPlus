@@ -11,8 +11,8 @@ using Microsoft.Win32;
 [assembly: AssemblyDescription("Official Setup & Uninstaller for Driver+ (x64)")]
 [assembly: AssemblyCompany("Driver+ Open Source Project")]
 [assembly: AssemblyProduct("Driver+")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.1.0")]
 
 namespace DriverPlusInstaller
 {
@@ -135,8 +135,9 @@ namespace DriverPlusInstaller
                     {
                         if (rk != null)
                         {
+                            string dispVer = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
                             rk.SetValue("DisplayName", "Driver+ (Clean-Room WHQL Edition)");
-                            rk.SetValue("DisplayVersion", "1.0.0");
+                            rk.SetValue("DisplayVersion", dispVer);
                             rk.SetValue("Publisher", "Driver+ Open Source Project");
                             rk.SetValue("DisplayIcon", mainExe);
                             rk.SetValue("InstallLocation", installDir);
@@ -347,14 +348,17 @@ namespace DriverPlusInstaller
         private readonly Button _installBtn;
         private readonly Label _statusLbl;
 
+        private readonly Image _brandImage;
+
         public SetupWizardForm(string defaultInstallDir)
         {
-            Text = "Driver+ v1.0.0 Setup (x64)";
-            ClientSize = new Size(540, 340);
+            string ver = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+            Text = "Driver+ v" + ver + " Setup (x64)";
+            ClientSize = new Size(540, 412);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
-            BackColor = Color.FromArgb(15, 23, 42);
+            BackColor = Color.FromArgb(11, 17, 32);
             ForeColor = Color.FromArgb(248, 250, 252);
             Font = new Font("Segoe UI", 9.5f, FontStyle.Regular);
 
@@ -369,21 +373,61 @@ namespace DriverPlusInstaller
             {
             }
 
-            var header = new Label
+            try
             {
-                Text = "Install Driver+ (Official WHQL Clean-Room Edition)",
-                Font = new Font("Segoe UI", 13.5f, FontStyle.Bold),
-                ForeColor = Color.FromArgb(52, 211, 153),
-                Location = new Point(24, 22),
-                AutoSize = true
-            };
-            Controls.Add(header);
+                using (Stream logoStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("DriverPlusInstaller.logo.png"))
+                {
+                    if (logoStream != null)
+                    {
+                        using (var ms = new MemoryStream())
+                        {
+                            logoStream.CopyTo(ms);
+                            ms.Position = 0;
+                            using (Image tmp = Image.FromStream(ms))
+                            {
+                                _brandImage = new Bitmap(tmp);
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            int contentTop = 22;
+            if (_brandImage != null)
+            {
+                var pic = new PictureBox
+                {
+                    Image = _brandImage,
+                    SizeMode = PictureBoxSizeMode.Zoom,
+                    Location = new Point(24, 16),
+                    Size = new Size(220, 96),
+                    BackColor = Color.Transparent
+                };
+                Controls.Add(pic);
+                contentTop = 118;
+            }
+            else
+            {
+                var header = new Label
+                {
+                    Text = "Install Driver+ (Official WHQL Clean-Room Edition)",
+                    Font = new Font("Segoe UI", 13.5f, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(56, 189, 248),
+                    Location = new Point(24, 22),
+                    AutoSize = true
+                };
+                Controls.Add(header);
+                contentTop = 58;
+            }
 
             var sub = new Label
             {
                 Text = "Native 64-bit Windows hardware scanner, Microsoft Update Catalog WHQL installer, Game Runtime Doctor, and HVCI Auditor. Zero adware or background services.",
                 ForeColor = Color.FromArgb(148, 163, 184),
-                Location = new Point(24, 54),
+                Location = new Point(24, contentTop),
                 Size = new Size(492, 42)
             };
             Controls.Add(sub);
@@ -391,14 +435,14 @@ namespace DriverPlusInstaller
             Controls.Add(new Label
             {
                 Text = "Installation Folder:",
-                Location = new Point(24, 108),
+                Location = new Point(24, contentTop + 52),
                 AutoSize = true
             });
 
             _dirBox = new TextBox
             {
                 Text = defaultInstallDir,
-                Location = new Point(24, 132),
+                Location = new Point(24, contentTop + 76),
                 Size = new Size(400, 26),
                 BackColor = Color.FromArgb(30, 41, 59),
                 ForeColor = Color.White,
@@ -409,7 +453,7 @@ namespace DriverPlusInstaller
             var browseBtn = new Button
             {
                 Text = "Browse...",
-                Location = new Point(432, 130),
+                Location = new Point(432, contentTop + 74),
                 Size = new Size(84, 28),
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.FromArgb(30, 41, 59),
@@ -432,9 +476,9 @@ namespace DriverPlusInstaller
             };
             Controls.Add(browseBtn);
 
-            _deskCheck = new CheckBox { Text = "Create Desktop shortcut", Checked = true, Location = new Point(24, 174), AutoSize = true };
-            _startCheck = new CheckBox { Text = "Create Start Menu shortcut", Checked = true, Location = new Point(24, 202), AutoSize = true };
-            _launchCheck = new CheckBox { Text = "Launch Driver+ immediately after installation", Checked = true, Location = new Point(24, 230), AutoSize = true };
+            _deskCheck = new CheckBox { Text = "Create Desktop shortcut", Checked = true, Location = new Point(24, contentTop + 118), AutoSize = true };
+            _startCheck = new CheckBox { Text = "Create Start Menu shortcut", Checked = true, Location = new Point(24, contentTop + 146), AutoSize = true };
+            _launchCheck = new CheckBox { Text = "Launch Driver+ immediately after installation", Checked = true, Location = new Point(24, contentTop + 174), AutoSize = true };
             Controls.Add(_deskCheck);
             Controls.Add(_startCheck);
             Controls.Add(_launchCheck);
@@ -443,7 +487,7 @@ namespace DriverPlusInstaller
             {
                 Text = "Ready to install.",
                 ForeColor = Color.FromArgb(148, 163, 184),
-                Location = new Point(24, 286),
+                Location = new Point(24, 358),
                 Size = new Size(340, 24)
             };
             Controls.Add(_statusLbl);
@@ -451,15 +495,24 @@ namespace DriverPlusInstaller
             _installBtn = new Button
             {
                 Text = "Install Now",
-                Location = new Point(386, 278),
+                Location = new Point(386, 350),
                 Size = new Size(130, 36),
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(5, 150, 105),
+                BackColor = Color.FromArgb(2, 132, 199),
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 10f, FontStyle.Bold)
             };
             _installBtn.Click += OnInstallClick;
             Controls.Add(_installBtn);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && _brandImage != null)
+            {
+                _brandImage.Dispose();
+            }
+            base.Dispose(disposing);
         }
 
         private void OnInstallClick(object sender, EventArgs e)

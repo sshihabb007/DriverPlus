@@ -7,6 +7,9 @@ $FwDir = 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319'
 $WpfDir = Join-Path $FwDir 'WPF'
 $Csc = Join-Path $FwDir 'csc.exe'
 $TestExe = Join-Path $ObjDir 'DriverPlusTests.exe'
+$AssetsDir = Join-Path $ProjectRoot 'assets'
+$IconPath = Join-Path $AssetsDir 'driverplus.ico'
+$LogoUiPath = Join-Path $AssetsDir 'logo-ui.png'
 
 $SrcDir = Join-Path $ProjectRoot 'src'
 $Sources = @()
@@ -43,6 +46,8 @@ Write-Host "[TDD] Compiling $($AllFiles.Count) source/test file(s) -> $TestExe"
     /r:"$WpfDir\WindowsBase.dll" `
     /r:"$WpfDir\PresentationCore.dll" `
     /r:"$WpfDir\PresentationFramework.dll" `
+    "/resource:$IconPath,DriverPlus.app.ico" `
+    "/resource:$LogoUiPath,DriverPlus.logo.png" `
     "/out:$TestExe" `
     @AllFiles
 

@@ -17,8 +17,8 @@ using DriverPlus.UI;
 [assembly: AssemblyCompany("Driver+ Open Source Project")]
 [assembly: AssemblyProduct("Driver+")]
 [assembly: AssemblyCopyright("Copyright (c) 2026 Driver+ Contributors (MIT License)")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.1.0")]
 
 namespace DriverPlus
 {

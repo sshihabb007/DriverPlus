@@ -102,6 +102,22 @@ namespace DriverPlus.UI
         {
             try
             {
+                using (Stream icoStream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("DriverPlus.app.ico"))
+                {
+                    if (icoStream != null)
+                    {
+                        var ms = new MemoryStream();
+                        icoStream.CopyTo(ms);
+                        ms.Position = 0;
+                        Icon = System.Windows.Media.Imaging.BitmapFrame.Create(
+                            ms,
+                            System.Windows.Media.Imaging.BitmapCreateOptions.None,
+                            System.Windows.Media.Imaging.BitmapCacheOption.OnLoad);
+                        ms.Dispose();
+                        return;
+                    }
+                }
+
                 string exeDir = AppDomain.CurrentDomain.BaseDirectory;
                 string icoCandidate = Path.Combine(exeDir, "driverplus.ico");
                 if (!File.Exists(icoCandidate))
@@ -116,6 +132,30 @@ namespace DriverPlus.UI
             catch
             {
             }
+        }
+
+        private static ImageSource TryLoadBrandLogoImage()
+        {
+            try
+            {
+                using (Stream pngStream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("DriverPlus.logo.png"))
+                {
+                    if (pngStream != null)
+                    {
+                        var bmp = new System.Windows.Media.Imaging.BitmapImage();
+                        bmp.BeginInit();
+                        bmp.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+                        bmp.StreamSource = pngStream;
+                        bmp.EndInit();
+                        bmp.Freeze();
+                        return bmp;
+                    }
+                }
+            }
+            catch
+            {
+            }
+            return null;
         }
 
         private void OnWindowSourceInitialized(object sender, EventArgs e)
@@ -224,41 +264,39 @@ namespace DriverPlus.UI
             var railDock = new DockPanel { LastChildFill = true };
 
             // Brand Header
-            var brandStack = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(4, 0, 0, 20) };
-            brandStack.Children.Add(new Border
+            var brandStack = new StackPanel { Orientation = Orientation.Vertical, Margin = new Thickness(2, 0, 2, 18) };
+            ImageSource brandLogo = TryLoadBrandLogoImage();
+            if (brandLogo != null)
             {
-                Width = 36,
-                Height = 36,
-                CornerRadius = new CornerRadius(9),
-                Background = ThemeTokens.EmeraldStrong,
-                BorderBrush = ThemeTokens.Emerald,
-                BorderThickness = new Thickness(1),
-                Margin = new Thickness(0, 0, 10, 0),
-                Child = new TextBlock
+                var logoImg = new Image
                 {
-                    Text = "D+",
-                    Foreground = Brushes.White,
+                    Source = brandLogo,
+                    Width = 198,
+                    Stretch = Stretch.Uniform,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    Margin = new Thickness(0, 0, 0, 6)
+                };
+                RenderOptions.SetBitmapScalingMode(logoImg, BitmapScalingMode.HighQuality);
+                brandStack.Children.Add(logoImg);
+            }
+            else
+            {
+                brandStack.Children.Add(new TextBlock
+                {
+                    Text = "Driver+",
+                    FontSize = 19,
                     FontWeight = FontWeights.ExtraBold,
-                    FontSize = 15,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                }
-            });
-            var titleCol = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-            titleCol.Children.Add(new TextBlock
+                    Foreground = ThemeTokens.TextPrimary,
+                    Margin = new Thickness(2, 0, 0, 2)
+                });
+            }
+            brandStack.Children.Add(new TextBlock
             {
-                Text = "Driver+",
-                FontSize = 17,
-                FontWeight = FontWeights.Bold,
-                Foreground = ThemeTokens.TextPrimary
-            });
-            titleCol.Children.Add(new TextBlock
-            {
-                Text = "WHQL Clean-Room Edition",
+                Text = "Official WHQL Clean-Room Edition",
                 FontSize = 11,
-                Foreground = ThemeTokens.TextMuted
+                Foreground = ThemeTokens.TextMuted,
+                Margin = new Thickness(4, 0, 0, 0)
             });
-            brandStack.Children.Add(titleCol);
             DockPanel.SetDock(brandStack, Dock.Top);
             railDock.Children.Add(brandStack);
 
