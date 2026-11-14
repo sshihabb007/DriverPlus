@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-verify:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build x64 Portable + Setup EXEs and run TDD & sandbox smoke tests
+        shell: pwsh
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -SkipDesktopCopy
+
+      - name: Upload verified x64 build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: DriverPlus-x64-Binaries
+          path: |
+            dist/DriverPlus-Portable-*-x64.exe
+            dist/DriverPlus-Setup-*-x64.exe
+            dist/selftest-report.txt

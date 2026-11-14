@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to publish or update (e.g. v1.0.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish-release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Build & verify x64 release binaries
+        shell: pwsh
+        run: |
+          $ver = "${{ inputs.tag }}".TrimStart('v')
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -SkipDesktopCopy -Version $ver
+          Push-Location dist
+          $lines = @()
+          foreach ($f in @("DriverPlus-Setup-$ver-x64.exe", "DriverPlus-Portable-$ver-x64.exe")) {
+            $h = (Get-FileHash -LiteralPath $f -Algorithm SHA256).Hash.ToLowerInvariant()
+            $lines += "$h  $f"
+          }
+          [System.IO.File]::WriteAllLines((Join-Path (Get-Location) "SHA256SUMS.txt"), $lines)
+          Pop-Location
+
+      - name: Publish or update GitHub Release assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ inputs.tag }}"
+          $ver = $tag.TrimStart('v')
+          $assets = @(
+            "dist/DriverPlus-Setup-$ver-x64.exe",
+            "dist/DriverPlus-Portable-$ver-x64.exe",
+            "dist/SHA256SUMS.txt"
+          )
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag @assets --clobber
+          } else {
+            gh release create $tag @assets --title "Driver+ $tag (x64)" --generate-notes
+          }
